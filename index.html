@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Student View — E-Bin</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            /* Added background image */
+            background-image: url('file:///C:/Users/Michelle%20G.%20Gonzaga/Downloads/368088851_370117105518360_1609236514994205022_n.png'); /* Replace with your own image if needed */
+            background-size: cover;        /* Cover entire screen */
+            background-position: center;   /* Center the image */
+            background-repeat: no-repeat;  /* Prevent tiling */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50px;
+            min-height: 100vh;            /* Ensure it covers full height */
+        }
+        header img {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            height: 100px;
+        }
+        h1 {
+            text-align: center;
+            color: black;
+            background-color: rgba(255,255,255,0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+        .level {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+        }
+        .led {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            background-color: red;
+            margin-right: 15px;
+            border: 1px solid #333;
+            transition: background-color 0.3s ease;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            transition: 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="file:///C:/Users/Michelle%20G.%20Gonzaga/Downloads/567601152_709691744893502_3844444132010668076_n.png" alt="Logo">
+</header>
+
+<h1>Student Control Panel — BE Room</h1>
+
+<div class="level"><div class="led" id="led25"></div><button onclick="setLevel(25)">25%</button></div>
+<div class="level"><div class="led" id="led50"></div><button onclick="setLevel(50)">50%</button></div>
+<div class="level"><div class="led" id="led75"></div><button onclick="setLevel(75)">75%</button></div>
+<div class="level"><div class="led" id="led100"></div><button onclick="setLevel(100)">100%</button></div>
+
+<h2 id="currentLevel">Current Level: loading...</h2>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBjivkJgnFQKoc2HmIzKYQIbJAHhYspwuA",
+    authDomain: "e-bin-database.firebaseapp.com",
+    projectId: "e-bin-database",
+    storageBucket: "e-bin-database.firebasestorage.app",
+    messagingSenderId: "783445929022",
+    appId: "1:783445929022:web:20632813c7259b7538756f",
+    measurementId: "G-J68JXHSLLK",
+    databaseURL: "https://e-bin-database-default-rtdb.firebaseio.com"
+};
+
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const db = getDatabase(app);
+
+window.setLevel = function(level) {
+    set(ref(db, 'binLevel'), level);
+}
+
+function updateLEDs(level) {
+    const ledIds = ['led25','led50','led75','led100'];
+    ledIds.forEach(id => {
+        document.getElementById(id).style.backgroundColor = (parseInt(id.replace('led','')) === level) ? 'green' : 'red';
+    });
+}
+
+const levelRef = ref(db, 'binLevel');
+onValue(levelRef, (snapshot) => {
+    const value = snapshot.val() || 0;
+    document.getElementById('currentLevel').innerText = 'Current Level: ' + value + '%';
+    updateLEDs(value);
+});
+</script>
+
+</body>
+</html>
